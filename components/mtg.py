@@ -25,6 +25,12 @@ async def card_cmd(message: str) -> list:
     return [embed]
 
 
+async def card_slash(name: str) -> list:
+    embed = await get_card_image(name)
+
+    return [embed]
+
+
 # API call to get card image
 async def get_card_image(name: str) -> dict:
     params = {"q": name, "format": "json"}
@@ -84,6 +90,8 @@ def card_image_embed(data) -> discord.Embed:
             return urls["png"]
         elif "large" in urls:
             return urls["large"]
+        else:
+            return None
 
     if "card_faces" in data:
         embed.set_image(url=get_image_url(data["card_faces"][0]["image_uris"]))
