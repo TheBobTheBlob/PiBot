@@ -20,12 +20,15 @@ async def card_brackets(message: str) -> list:
 
 async def card_cmd(message: str) -> list:
     card = message.lstrip(f"{PREFIX}card ")
-    return [await get_card_image(card)]
+    embed = await get_card_image(card)
+
+    return [embed]
 
 
 # API call to get card image
 async def get_card_image(name: str) -> dict:
     params = {"q": name, "format": "json"}
+
     async with aiohttp.ClientSession() as session:
         async with session.get(URL + "cards/search/", params=params) as resp:
             matches = await resp.json()
@@ -44,7 +47,7 @@ async def get_card_image(name: str) -> dict:
         elif matches["total_cards"] <= 5:
             embed = discord.Embed(
                 title=f'Multiple cards found for "{name}"',
-                description="The following cards all match your search term. Please select which one you want, or refine your search.",
+                description="The following cards all match your search term. Select one to view.",
                 color=COLOR,
             )
 
@@ -75,11 +78,17 @@ class MultiCardButton(discord.ui.Button):
 # Creates embed with title and image
 def card_image_embed(data) -> discord.Embed:
     embed = discord.Embed(title=data["name"], url=data["scryfall_uri"], color=COLOR)
-    image_urls = data["image_uris"]
 
-    if "png" in image_urls:
-        embed.set_image(url=image_urls["png"])
-    elif "large" in image_urls:
-        embed.set_image(url=image_urls["large"])
+    def get_image_url(urls: dict) -> str | None:
+        if "png" in urls:
+            return urls["png"]
+        elif "large" in urls:
+            return urls["large"]
+
+    if "card_faces" in data:
+        embed.set_image(url=get_image_url(data["card_faces"][0]["image_uris"]))
+        embed.set_thumbnail(url=get_image_url(data["card_faces"][1]["image_uris"]))
+    else:
+        embed.set_image(url=get_image_url(data["image_uris"]))
 
     return embed

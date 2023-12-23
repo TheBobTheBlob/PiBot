@@ -7,9 +7,9 @@ from components import misc, mtg
 
 load_dotenv()
 PREFIX = os.getenv("PREFIX")
-DEV_ID = os.getenv("DEV_ID")
+OWNER_ID = os.getenv("OWNER_ID")
 
-# Discord.py setup
+# DISCORD.PY SETUP
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -33,34 +33,30 @@ async def on_message(message) -> None:
             responses = await mtg.card_brackets(message.content)
         case m if m.startswith(f"{PREFIX}card "):
             responses = await mtg.card_cmd(message.content)
-        # case m if m == f"{PREFIX}sync":
-        #     if message.author.id == int(DEV_ID):
-        #         await tree.sync()
-        #         responses = await misc.sync_slash_commands()
-        #     else:
-        #         return
+        case m if m == f"{PREFIX}sync":
+            if message.author.id == int(OWNER_ID):
+                responses = await misc.sync_slash_commands(tree)
+            else:
+                return
         case _:
             return
 
     for response in responses:
-        if response["view"] is None:
-            await message.channel.send(embed=response["embed"])
-        else:
-            await message.channel.send(embed=response["embed"], view=response["view"])
+        responses = await mtg.card_cmd(message.content)
+        await message.channel.send(embed=response["embed"], view=response["view"])
 
 
-@tree.command(name="test", description="Shows the server rules")
-async def rules(interaction: discord.Interaction) -> None:
-    rules = (
-        "1. Don't say bad words",
-        "2. Respect other people",
-        "3. You mustn't speak loud in voice channels",
-    )
-
-    await interaction.response.send_message(f"{rules}")
+# SLASH COMMANDS
 
 
-# Get TOKEN and start bot
+@tree.command(name="card", description="Search for an MTG card")
+async def slash_card(interaction: discord.Interaction, name: str) -> None:
+    responses = await mtg.card_cmd(name)
+    print(responses)
+    await interaction.response.send_message(embed=responses[0]["embed"], view=responses[0]["view"])
+
+
+# GET TOKEN AND START BOT
 
 if (TOKEN := os.getenv("TOKEN")) is not None:
     client.run(TOKEN)

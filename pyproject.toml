@@ -1,6 +1,6 @@
 [project]
 name = "PiBot"
-version = "0.1a"
+version = "1.0.0a"
 requires-python = ">=3.11"
 dependencies = ["discord.py", "python-dotenv"]
 authors = [{ name = "Punit Turlapati", email = "punitsst@gmail.com" }]

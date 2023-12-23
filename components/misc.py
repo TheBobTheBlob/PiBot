@@ -3,9 +3,10 @@ import discord
 from .discordenvs import COLOR
 
 
-async def sync_slash_commands() -> list:
+async def sync_slash_commands(tree) -> list:
+    await tree.sync()
     embed = discord.Embed(
-        title="Finished syncing slash commands",
+        title="Synced slash commands",
         color=COLOR,
     )
 
