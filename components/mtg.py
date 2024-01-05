@@ -3,12 +3,12 @@ import re
 import aiohttp
 import discord
 
-from .discordenvs import COLOR, PREFIX
+from .discordenvs import COLOR, PREFIX, PiEmbed
 
 URL = "https://api.scryfall.com/"
 
 
-async def card_brackets(message: str) -> list:
+async def card_brackets(message: str) -> list[PiEmbed]:
     cards = re.findall(r"\[\[(.+?)\]\]", message)
     embeds = []
 
@@ -18,21 +18,20 @@ async def card_brackets(message: str) -> list:
     return embeds
 
 
-async def card_cmd(message: str) -> list:
+async def card_cmd(message: str) -> list[PiEmbed]:
     card = message.lstrip(f"{PREFIX}card ")
     embed = await get_card_image(card)
 
     return [embed]
 
 
-async def card_slash(name: str) -> list:
+async def card_slash(name: str) -> list[PiEmbed]:
     embed = await get_card_image(name)
-
     return [embed]
 
 
 # API call to get card image
-async def get_card_image(name: str) -> dict:
+async def get_card_image(name: str) -> PiEmbed:
     params = {"q": name, "format": "json"}
 
     async with aiohttp.ClientSession() as session:
@@ -49,8 +48,7 @@ async def get_card_image(name: str) -> dict:
     else:
         if matches["total_cards"] == 1:
             embed = card_image_embed(matches["data"][0])
-
-        elif matches["total_cards"] <= 5:
+        elif matches["total_cards"] <= 5:  # 5 is the maximum number of buttons per Discord message
             embed = discord.Embed(
                 title=f'Multiple cards found for "{name}"',
                 description="The following cards all match your search term. Select one to view.",
@@ -67,7 +65,7 @@ async def get_card_image(name: str) -> dict:
                 color=COLOR,
             )
 
-    return {"embed": embed, "view": view}
+    return PiEmbed(embed=embed, view=view)
 
 
 # Class for dynamic buttons
@@ -76,7 +74,7 @@ class MultiCardButton(discord.ui.Button):
         self.data = data
         super().__init__(style=discord.ButtonStyle.grey, label=self.data["name"])
 
-    async def callback(self, interaction: discord.Interaction):
+    async def callback(self, interaction: discord.Interaction) -> None:
         embed = card_image_embed(self.data)
         await interaction.response.edit_message(embed=embed, view=None)
 
@@ -90,10 +88,12 @@ def card_image_embed(data) -> discord.Embed:
             return urls["png"]
         elif "large" in urls:
             return urls["large"]
+        elif "normal" in urls:
+            return urls["normal"]
         else:
             return None
 
-    if "card_faces" in data:
+    if "card_faces" in data and "image_uris" not in data:
         embed.set_image(url=get_image_url(data["card_faces"][0]["image_uris"]))
         embed.set_thumbnail(url=get_image_url(data["card_faces"][1]["image_uris"]))
     else:
