@@ -11,7 +11,7 @@ async def admin_commands(message, **kwargs) -> PiEmbed:
     match command:
         case "sync":
             embed = await sync_slash_commands(**kwargs)
-        case "events config":
+        case s if s.startwith("events config "):
             embed = await events_config(message)
         # case "" | "help":
         #     embed = await admin_help()
