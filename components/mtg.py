@@ -3,35 +3,35 @@ import re
 import aiohttp
 import discord
 
-from .discordenvs import COLOR, PREFIX, PiEmbed
+from .discordenvs import PREFIX, PiEmbed, PiList
 
 URL = "https://api.scryfall.com/"
 
 
-async def card_brackets(message: str) -> list[PiEmbed]:
+async def card_brackets(message: str) -> PiList:
     cards = re.findall(r"\[\[(.+?)\]\]", message)
-    embeds = []
+    embeds = PiList()
 
     for card in cards:
-        embeds.append(await get_card_image(card))
+        embeds.add(await get_card(card))
 
     return embeds
 
 
-async def card_cmd(message: str) -> list[PiEmbed]:
-    card = message.lstrip(f"{PREFIX}card ")
-    embed = await get_card_image(card)
+async def card_cmd(message: str) -> PiEmbed:
+    card = message.lstrip(f"{PREFIX}card")
+    embed = await get_card(card)
 
-    return [embed]
+    return embed
 
 
-async def card_slash(name: str) -> list[PiEmbed]:
-    embed = await get_card_image(name)
-    return [embed]
+async def card_slash(name: str) -> PiEmbed:
+    embed = await get_card(name)
+    return embed
 
 
 # API call to get card image
-async def get_card_image(name: str) -> PiEmbed:
+async def get_card(name: str) -> PiEmbed:
     params = {"q": name, "format": "json"}
 
     async with aiohttp.ClientSession() as session:
@@ -41,10 +41,7 @@ async def get_card_image(name: str) -> PiEmbed:
     view = None
 
     if matches["object"] == "error":
-        embed = discord.Embed(
-            title=f'No cards found for "{name}"',
-            color=COLOR,
-        )
+        embed = discord.Embed(title=f'No cards found for "{name}"')
     else:
         if matches["total_cards"] == 1:
             embed = card_image_embed(matches["data"][0])
@@ -52,7 +49,6 @@ async def get_card_image(name: str) -> PiEmbed:
             embed = discord.Embed(
                 title=f'Multiple cards found for "{name}"',
                 description="The following cards all match your search term. Select one to view.",
-                color=COLOR,
             )
 
             view = discord.ui.View()
@@ -62,7 +58,6 @@ async def get_card_image(name: str) -> PiEmbed:
             embed = discord.Embed(
                 title=f'Multiple cards found for "{name}"',
                 description="More than 5 cards match your search. Please refine your search term.",
-                color=COLOR,
             )
 
     return PiEmbed(embed=embed, view=view)
@@ -81,7 +76,7 @@ class MultiCardButton(discord.ui.Button):
 
 # Creates embed with title and image
 def card_image_embed(data) -> discord.Embed:
-    embed = discord.Embed(title=data["name"], url=data["scryfall_uri"], color=COLOR)
+    embed = discord.Embed(title=data["name"], url=data["scryfall_uri"])
 
     def get_image_url(urls: dict) -> str | None:
         if "png" in urls:

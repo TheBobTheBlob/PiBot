@@ -2,7 +2,7 @@
 name = "PiBot"
 version = "1.0.0a"
 requires-python = ">=3.11"
-dependencies = ["discord.py", "python-dotenv"]
+dependencies = ["discord.py", "python-dotenv", "oracledb"]
 authors = [{ name = "Punit Turlapati", email = "punitsst@gmail.com" }]
 description = "A custom bot for the Nu Deuteron chapter of Alpha Epsilon Pi"
 readme = "README.md"
