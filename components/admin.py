@@ -5,8 +5,8 @@ from database import oracle
 from .discordenvs import PREFIX, PiEmbed
 
 
-async def admin_commands(message, **kwargs) -> PiEmbed:
-    command = message.strip(f"{PREFIX}admin ")
+async def admin_commands(message: discord.Message, **kwargs) -> PiEmbed:
+    command = message.content.strip(f"{PREFIX}admin ")
 
     match command:
         case "sync":
@@ -29,7 +29,7 @@ async def sync_slash_commands(tree) -> discord.Embed:
 
 
 async def events_config(message) -> discord.Embed:
-    command = message.strip(f"{PREFIX}admin events config ")
+    command = message.content.strip(f"{PREFIX}admin events config ")
     await oracle.new_event_config(message.guild.id, command.split(" ")[0], command.split(" ")[1])
 
     embed = discord.Embed(title="Configured events for this server")

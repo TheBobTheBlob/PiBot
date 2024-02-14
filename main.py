@@ -34,7 +34,7 @@ async def on_ready() -> None:
 
 
 @client.event
-async def on_message(message) -> None:
+async def on_message(message: discord.Message) -> None:
     if message.author == client.user:
         return
 
@@ -46,7 +46,7 @@ async def on_message(message) -> None:
     elif text.startswith(f"{PREFIX}card "):
         result = await mtg.card_cmd(message.content)
     elif text.startswith(f"{PREFIX}admin") and is_admin:
-        result = await admin.admin_commands(message.content, tree=tree)
+        result = await admin.admin_commands(message, tree=tree)
     elif text == f"{PREFIX}dailyfact":
         result = await misc.dailyfact()
     elif text.startswith(f"{PREFIX}info"):
