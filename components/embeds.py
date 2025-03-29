@@ -8,8 +8,8 @@ load_dotenv()
 
 PREFIX = os.environ["PREFIX"]
 try:
-    COLOR = discord.Color.from_str(os.environ["COLOR"])
-except KeyError:
+    COLOR = discord.Color.from_str("#BFB4A0")
+except ValueError:
     COLOR = discord.Color.blurple()
 
 
