@@ -27,10 +27,11 @@ docker run  --env-file .env -d discord-bot
 
 All commands must be prefixed with the prefix if used in a message, or are accessible through Discord's slash commands.
 
-- `info`: Shows some information about the bot
-- `help`: Shows help for the bot
+- `summarise`: Uses generative AI to summarise a message. Awailable through messages or the context menu.
 - `dailyfact`: Shows a daily fact
 - `shipfact`: Uses generative AI to create a **fake** fact about ships
+- `info`: Shows some information about the bot
+- `help`: Shows help for the bot
 
 ### Admin Commands
 

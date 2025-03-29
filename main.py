@@ -3,7 +3,7 @@ import os
 import discord
 from dotenv import load_dotenv
 
-from components import admin, ai, misc
+from components import admin, ai, embeds, misc
 
 load_dotenv()
 
@@ -41,16 +41,28 @@ async def on_message(message: discord.Message) -> None:
         result = await admin.admin_commands(message, tree=tree)
     elif text == f"{PREFIX}dailyfact":
         result = await misc.dailyfact()
+    elif text.startswith(f"{PREFIX}summarise"):
+        if message.reference is None or message.reference.message_id is None:
+            result = await embeds.error_embed("Please reply to a message to summarise it.")
+        else:
+            referenced_message = await message.channel.fetch_message(message.reference.message_id)
+            result = await ai.summarise(referenced_message)
     elif text.startswith(f"{PREFIX}info"):
-        result = await misc.info_embed()
+        result = await embeds.info_embed()
     elif text.startswith(f"{PREFIX}help"):
-        result = await misc.help_embed(is_admin)
+        result = await embeds.help_embed(is_admin)
     elif text.startswith(f"{PREFIX}shipfact"):
         result = await ai.fake_ship_fact()
     else:
         return
 
-    await message.channel.send(embed=result.embed, view=result.view, file=result.file)
+    kwargs = {"embed": result.embed}
+    if result.view is not None:
+        kwargs["view"] = result.view
+    if result.file is not None:
+        kwargs["file"] = result.file
+
+    await message.channel.send(**kwargs)
 
 
 # SLASH COMMANDS
@@ -58,13 +70,13 @@ async def on_message(message: discord.Message) -> None:
 
 @tree.command(name="info", description="Shows information about PiBot")
 async def slash_info(interaction: discord.Interaction) -> None:
-    result = await misc.info_embed()
+    result = await embeds.info_embed()
     await interaction.response.send_message(embed=result.embed)
 
 
 @tree.command(name="help", description="Get help for PiBot commands")
 async def slash_help(interaction: discord.Interaction) -> None:
-    result = await misc.help_embed(interaction.user.id == OWNER_ID)
+    result = await embeds.help_embed(interaction.user.id == OWNER_ID)
     await interaction.response.send_message(embed=result.embed)
 
 
@@ -77,6 +89,15 @@ async def slash_dailyfact(interaction: discord.Interaction) -> None:
 @tree.command(name="shipfact", description="Get a random ship fact")
 async def slash_shipfact(interaction: discord.Interaction) -> None:
     result = await ai.fake_ship_fact()
+    await interaction.response.send_message(embed=result.embed)
+
+
+# CONTEXT MENU COMMANDS
+
+
+@tree.context_menu(name="Summarise")
+async def summarise_context_menu(interaction: discord.Interaction, message: discord.Message):
+    result = await ai.summarise(message)
     await interaction.response.send_message(embed=result.embed)
 
 
