@@ -36,6 +36,7 @@ async def summarise(message: discord.Message) -> PiEmbed:
     embed = discord.Embed(
         title=f"Summary for {message.author.name}'s message",
         description=response.output_text,
+        url=message.jump_url,
     )
 
     return PiEmbed(embed=embed)
@@ -63,6 +64,7 @@ async def describe_image(message: discord.Message, url: str) -> PiEmbed:
     embed = discord.Embed(
         title=f"Description of image sent by {message.author.name}",
         description=response.output_text,
+        url=message.jump_url,
     )
     embed.set_thumbnail(url=url)
 
@@ -81,6 +83,7 @@ async def rate_meme(message: discord.Message, url: str) -> PiEmbed:
     embed = discord.Embed(
         title=f"This meme from {message.author.name} is rated **{rating}/10**",
         description=response.output_text,
+        url={message.jump_url},
     )
     embed.set_thumbnail(url=url)
 
