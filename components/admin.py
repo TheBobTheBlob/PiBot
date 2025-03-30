@@ -19,6 +19,7 @@ async def admin_commands(message: discord.Message, **kwargs) -> PiEmbed:
 
 async def sync_slash_commands(tree: discord.app_commands.CommandTree) -> discord.Embed:
     await tree.sync()
+    print("Synced slash commands")
     embed = discord.Embed(title="Synced slash commands")
 
     return embed
