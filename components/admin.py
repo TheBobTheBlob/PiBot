@@ -4,7 +4,7 @@ from .embeds import PREFIX, PiEmbed
 
 
 async def admin_commands(message: discord.Message, **kwargs) -> PiEmbed:
-    command = message.content.lower().strip(f"{PREFIX}admin ")
+    command = message.content.lower().strip().strip(f"{PREFIX}admin ")
 
     match command:
         case "sync":

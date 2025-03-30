@@ -15,10 +15,13 @@ except ValueError:
 
 
 class PiEmbed:
-    def __init__(self, embed, view: None | discord.ui.View = None, file: None | discord.File = None):
+    def __init__(
+        self, embed, view: None | discord.ui.View = None, file: None | discord.File = None, ephemeral: bool = False
+    ):
         self.embed = embed
         self.view = view
         self.file = file
+        self.ephemeral = ephemeral
 
         self.embed.color = COLOR
 
@@ -27,6 +30,7 @@ class PiEmbed:
 class CommandHelp:
     name: str
     description: str
+    context_menu: bool = False
 
 
 @dataclass
@@ -47,17 +51,25 @@ commands = [
         ],
     ),
     CommandCategory(
+        "Images",
+        "Commands that work on images.",
+        commands=[
+            CommandHelp(name="Describe", description="Describe the content of an image", context_menu=True),
+            CommandHelp(name="Rate Meme", description="Find how good your meme is, and why", context_menu=True),
+        ],
+    ),
+    CommandCategory(
         name="Miscellaneous",
         description="Other commands available to use.",
         commands=[
-            CommandHelp(name="summarise", description="Summarise a message"),
+            CommandHelp(name="Summarise", description="Summarise a message", context_menu=True),
             CommandHelp(name="info", description="Shows basic information about this bot"),
             CommandHelp(name="help", description="Shows this help message"),
         ],
     ),
     CommandCategory(
         name="Admin",
-        description="Commands for the bot administrator.",
+        description="Commands for the bot administrator. Not accessible via slash commands, type them out as a normal message.",
         commands=[
             CommandHelp(name="admin sync", description="Sync slash commands"),
         ],
@@ -67,7 +79,10 @@ commands = [
 
 
 async def help_embed(is_admin: bool) -> PiEmbed:
-    embed = discord.Embed(title="PiBot Help")
+    embed = discord.Embed(
+        title="PiBot Help",
+        description="List of commands available to you. Commands starting with / are accessible via slash commands, while the others are accessible via the application commands menu.",
+    )
 
     for category in commands:
         if category.for_admin and not is_admin:
@@ -76,9 +91,9 @@ async def help_embed(is_admin: bool) -> PiEmbed:
         text = category.description
 
         for command in category.commands:
-            text += f"\n- `{PREFIX}{command.name}` {command.description}"
+            text += f"\n- `{'' if command.context_menu else PREFIX}{command.name}` {command.description}"
 
-        embed.add_field(name=category.name, value=text)
+        embed.add_field(name=category.name, value=text, inline=False)
 
     return PiEmbed(embed=embed)
 
@@ -86,7 +101,7 @@ async def help_embed(is_admin: bool) -> PiEmbed:
 async def info_embed() -> PiEmbed:
     embed = discord.Embed(
         title="PiBot Information",
-        description="PiBot is a custom bot for the Nu Deuteron chapter of Alpha Epsilon Pi",
+        description="PiBot is a custom Discord bot for the Nu Deuteron chapter of Alpha Epsilon Pi",
     )
 
     file = discord.File("static/logo.jpg", filename="logo.jpg")
@@ -100,4 +115,4 @@ async def info_embed() -> PiEmbed:
 
 async def error_embed(message: str) -> PiEmbed:
     embed = discord.Embed(title="Error", description=message)
-    return PiEmbed(embed=embed)
+    return PiEmbed(embed=embed, ephemeral=True)

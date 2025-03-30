@@ -39,20 +39,6 @@ async def on_message(message: discord.Message) -> None:
 
     if text.startswith(f"{PREFIX}admin") and is_admin:
         result = await admin.admin_commands(message, tree=tree)
-    elif text == f"{PREFIX}dailyfact":
-        result = await misc.dailyfact()
-    elif text.startswith(f"{PREFIX}summarise"):
-        if message.reference is None or message.reference.message_id is None:
-            result = await embeds.error_embed("Please reply to a message to summarise it.")
-        else:
-            referenced_message = await message.channel.fetch_message(message.reference.message_id)
-            result = await ai.summarise(referenced_message)
-    elif text.startswith(f"{PREFIX}info"):
-        result = await embeds.info_embed()
-    elif text.startswith(f"{PREFIX}help"):
-        result = await embeds.help_embed(is_admin)
-    elif text.startswith(f"{PREFIX}shipfact"):
-        result = await ai.fake_ship_fact()
     else:
         return
 
@@ -96,9 +82,30 @@ async def slash_shipfact(interaction: discord.Interaction) -> None:
 
 
 @tree.context_menu(name="Summarise")
-async def summarise_context_menu(interaction: discord.Interaction, message: discord.Message):
-    result = await ai.summarise(message)
-    await interaction.response.send_message(embed=result.embed)
+async def summarise(interaction: discord.Interaction, message: discord.Message):
+    if len(message.content) < 5:
+        result = await embeds.error_embed("Text too short to summarise")
+    else:
+        result = await ai.summarise(message)
+    await interaction.response.send_message(embed=result.embed, ephemeral=result.ephemeral)
+
+
+@tree.context_menu(name="Describe")
+async def describe_image(interaction: discord.Interaction, message: discord.Message):
+    if message.attachments:
+        result = await ai.describe_image(message, message.attachments[0].url)
+    else:
+        result = await embeds.error_embed("No image found in the message")
+    await interaction.response.send_message(embed=result.embed, ephemeral=result.ephemeral)
+
+
+@tree.context_menu(name="Rate Meme")
+async def rate_meme(interaction: discord.Interaction, message: discord.Message):
+    if message.attachments:
+        result = await ai.rate_meme(message, message.attachments[0].url)
+    else:
+        result = await embeds.error_embed("No image found in the message")
+    await interaction.response.send_message(embed=result.embed, ephemeral=result.ephemeral)
 
 
 # Start bot
