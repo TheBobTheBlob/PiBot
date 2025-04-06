@@ -99,7 +99,7 @@ async def rate_meme(message: discord.Message, url: str) -> PiEmbed:
 
 
 OLLAMA_URL = "http://ollama:11434"
-OLLAMA_PARAMS = {"model": "phi4", "stream": False}
+OLLAMA_PARAMS = {"model": "phi3", "stream": False}
 
 
 async def ask_ollama(prompt: str):
@@ -115,6 +115,6 @@ async def ask_ollama(prompt: str):
         title="Ask Me Anything",
         description=data["response"],
     )
-    embed.set_footer(text=f"Prompt sent to phi4: {prompt}")
+    embed.set_footer(text=f"Prompt sent to phi3: {prompt}")
 
     return PiEmbed(embed=embed)
