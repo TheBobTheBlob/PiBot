@@ -13,14 +13,10 @@ PREFIX=Prefix for the bot to use
 OWNER_ID=Discord user id for admin command permission
 ```
 
-Then, install docker and run the following commands to create a container and run it.
+Then, install docker and docker compose and run the following commands to start up the bot.
 
 ```shell
-docker build -t discord-bot .
-```
-
-```shell
-docker run  --env-file .env -d discord-bot
+docker compose up -d
 ```
 
 ## Commands
