@@ -110,6 +110,7 @@ async def info_embed() -> PiEmbed:
 
     embed.add_field(name="Repository", value="https://github.com/TheBobTheBlob/PiBot")
     embed.add_field(name="Birthday", value="December 13, 2023")
+    embed.add_field(name="Version", value="1.1.0")
 
     return PiEmbed(embed=embed, file=file)
 

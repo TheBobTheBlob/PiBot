@@ -1,8 +1,8 @@
 [project]
 name = "PiBot"
-version = "1.0.0"
+version = "1.1.0"
 requires-python = ">=3.12"
-dependencies = ["discord.py", "python-dotenv", "openai"]
+dependencies = ["discord.py", "python-dotenv", "openai", "aiohttp"]
 authors = [{ name = "Punit Turlapati", email = "punitsst@gmail.com" }]
 description = "A custom bot for the Nu Deuteron chapter of Alpha Epsilon Pi"
 readme = "README.md"
