@@ -86,7 +86,7 @@ async def test(interaction: discord.Interaction, question: str) -> None:
         result = await ai.ask_ollama(question)
     except OllamaAPIError:
         result = await embeds.error_embed("The local AI agent had an error. Please try again later.")
-    await interaction.followup.send(embed=result.embed)
+    await interaction.followup.send(embed=result.embed, ephemeral=result.ephemeral)
 
 
 # CONTEXT MENU COMMANDS

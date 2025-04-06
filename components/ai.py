@@ -107,6 +107,7 @@ async def ask_ollama(prompt: str):
             if resp.status == 200:
                 data = await resp.json()
             else:
+                print(f"Ollama Error: {resp}")
                 raise OllamaAPIError
 
     embed = discord.Embed(
