@@ -10,7 +10,7 @@ services:
   ollama-models-pull:
     image: curlimages/curl:latest
     command: >
-      http://ollama:11434/api/pull -d '{"name":"llama3"}'
+      http://ollama:11434/api/pull -d '{"name":"phi4"}'
     depends_on:
       - ollama
     networks:
