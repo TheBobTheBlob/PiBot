@@ -1,0 +1,36 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    networks:
+      - backend
+    volumes:
+      - ollama-data:/root/.ollama
+  ollama-models-pull:
+    image: curlimages/curl:latest
+    command: >
+      http://ollama:11434/api/pull -d '{"name":"llama3"}'
+    depends_on:
+      - ollama
+    networks:
+      - backend
+  bot:
+    build: .
+    env_file: .env
+    depends_on:
+      - ollama
+      - ollama-models-pull
+    networks:
+      - backend
+    volumes:
+      - .:/app
+    working_dir: /app
+    command: python main.py
+
+networks:
+  backend:
+
+
+volumes:
+  ollama-data:

@@ -62,6 +62,7 @@ commands = [
         name="Miscellaneous",
         description="Other commands available to use.",
         commands=[
+            CommandHelp(name="ask", description="Ask me (nearly) anything"),
             CommandHelp(name="Summarise", description="Summarise a message", context_menu=True),
             CommandHelp(name="info", description="Shows basic information about this bot"),
             CommandHelp(name="help", description="Shows this help message"),

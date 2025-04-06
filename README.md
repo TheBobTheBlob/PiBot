@@ -27,6 +27,7 @@ docker run  --env-file .env -d discord-bot
 
 Commands starting with / are accessible via slash commands, while the others are accessible via the application commands menu.
 
+- `ask`: Ask a generative AI model a question.
 - `Summarise`: Uses generative AI to summarise a message.
 - `/dailyfact`: Shows a daily fact
 - `/shipfact`: Uses generative AI to create a **fake** fact about ships

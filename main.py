@@ -4,6 +4,7 @@ import discord
 from dotenv import load_dotenv
 
 from components import admin, ai, embeds, misc
+from components.exceptions import OllamaAPIError
 
 load_dotenv()
 
@@ -76,6 +77,16 @@ async def slash_dailyfact(interaction: discord.Interaction) -> None:
 async def slash_shipfact(interaction: discord.Interaction) -> None:
     result = await ai.fake_ship_fact()
     await interaction.response.send_message(embed=result.embed)
+
+
+@tree.command(name="ask", description="Ask PiBot a question")
+async def test(interaction: discord.Interaction, question: str) -> None:
+    await interaction.response.defer()
+    try:
+        result = await ai.ask_ollama(question)
+    except OllamaAPIError:
+        result = await embeds.error_embed("The local AI agent had an error. Please try again later.")
+    await interaction.followup.send(embed=result.embed)
 
 
 # CONTEXT MENU COMMANDS

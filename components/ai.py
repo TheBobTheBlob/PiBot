@@ -1,13 +1,17 @@
 import os
 import random
 
+import aiohttp
 import discord
 from openai import OpenAI
 
 from .embeds import PiEmbed
+from .exceptions import OllamaAPIError
+
+# CHATGPT API
+
 
 OPENAI_KEY = os.environ["OPENAI"]
-
 MODEL = "gpt-4o-mini"
 
 client = OpenAI(api_key=OPENAI_KEY)
@@ -86,5 +90,29 @@ async def rate_meme(message: discord.Message, url: str) -> PiEmbed:
         url={message.jump_url},
     )
     embed.set_thumbnail(url=url)
+
+    return PiEmbed(embed=embed)
+
+
+# OLLAMA API
+
+
+OLLAMA_URL = "http://ollama:11434"
+OLLAMA_PARAMS = {"model": "llama3", "stream": False}
+
+
+async def ask_ollama(prompt: str):
+    async with aiohttp.ClientSession() as session:
+        async with session.post(f"{OLLAMA_URL}/api/generate", json={**OLLAMA_PARAMS, "prompt": prompt}) as resp:
+            if resp.status == 200:
+                data = await resp.json()
+            else:
+                raise OllamaAPIError
+
+    embed = discord.Embed(
+        title="Ask Me Anything",
+        description=data["response"],
+    )
+    embed.set_footer(text=f"Prompt sent to llama3: {prompt}")
 
     return PiEmbed(embed=embed)
